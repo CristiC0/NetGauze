@@ -14,6 +14,7 @@
 // limitations under the License.
 
 use super::*;
+use crate::default_tcp_keepalive;
 use futures_util::SinkExt;
 use netgauze_bmp_pkt::v3::{InitiationInformation, InitiationMessage};
 use tokio::net::TcpStream;
@@ -42,6 +43,7 @@ async fn test_actor_lifecycle() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");
@@ -80,6 +82,7 @@ async fn test_bmp_message_reception() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");
@@ -126,6 +129,7 @@ async fn test_peer_management_disconnect() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");
@@ -193,6 +197,7 @@ async fn test_sharded_subscription() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");
@@ -242,6 +247,7 @@ async fn test_subscription_unsubscribe() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");
@@ -296,6 +302,7 @@ async fn test_subscription_updates_existing_connection() {
         None,
         100,
         Duration::from_millis(500),
+        default_tcp_keepalive(),
         either::Either::Left(meter),
     )
     .expect("failed to create actor");

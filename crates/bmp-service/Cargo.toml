@@ -29,7 +29,7 @@ tower = { workspace = true, default-features = false, features = ["buffer", "uti
 tower-service = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
-socket2 = { workspace = true }
+socket2 = { workspace = true, features = ["all"] }
 async-channel = { workspace = true }
 either = { workspace = true }
 opentelemetry = { workspace = true, features = ["metrics", "trace", "logs"] }

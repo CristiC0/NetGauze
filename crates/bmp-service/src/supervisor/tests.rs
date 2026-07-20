@@ -14,6 +14,7 @@
 // limitations under the License.
 
 use super::*;
+use crate::default_tcp_keepalive;
 use futures_util::SinkExt;
 use netgauze_bmp_pkt::BmpMessage;
 use netgauze_bmp_pkt::codec::BmpCodec;
@@ -50,6 +51,7 @@ fn create_test_config() -> SupervisorConfig {
         ],
         cmd_buffer_size: 10,
         subscriber_timeout: Duration::from_secs(1),
+        keepalive: default_tcp_keepalive(),
     }
 }
 

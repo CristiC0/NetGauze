@@ -21,7 +21,9 @@ use crate::publishers::http::HttpPublisherEndpoint;
 use crate::publishers::{kafka_avro, kafka_json, kafka_yang};
 use crate::yang_push::config::TelemetryYangConverter;
 use ipnet::IpNet;
-use netgauze_bmp_service::supervisor as bmp_supervisor;
+use netgauze_bmp_service::{
+    TcpKeepaliveConfig, default_tcp_keepalive, supervisor as bmp_supervisor,
+};
 use netgauze_flow_service::flow_supervisor;
 use netgauze_udp_notif_service::supervisor as udp_notif_supervisor;
 use netgauze_yang_push::cache::storage::YangLibraryReference;
@@ -195,6 +197,9 @@ pub struct BmpConfig {
     #[serde(default = "default_cmd_size_buffer")]
     pub cmd_buffer_size: usize,
 
+    #[serde(default = "default_tcp_keepalive")]
+    pub keepalive: Option<TcpKeepaliveConfig>,
+
     pub listeners: Vec<Binding>,
 
     pub publishers: HashMap<String, PublisherConfig>,
@@ -206,6 +211,7 @@ impl BmpConfig {
             binding_addresses: self.listeners.iter().cloned().map(|x| x.into()).collect(),
             subscriber_timeout: self.subscriber_timeout,
             cmd_buffer_size: self.cmd_buffer_size,
+            keepalive: self.keepalive,
         }
     }
 }

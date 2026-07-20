@@ -64,8 +64,8 @@
 //! - Provides methods to query active peers and disconnect them
 
 use crate::{
-    ActorId, AddrInfo, BmpReceiver, BmpSender, SubscriberId, Subscription, create_bmp_channel,
-    new_tcp_reuse_port,
+    ActorId, AddrInfo, BmpReceiver, BmpSender, SubscriberId, Subscription, TcpKeepaliveConfig,
+    create_bmp_channel, new_tcp_reuse_port,
 };
 use futures_util::StreamExt;
 use netgauze_bmp_pkt::BmpMessage;
@@ -1037,6 +1037,7 @@ impl BmpActorHandle {
         interface_bind: Option<String>,
         cmd_buffer_size: usize,
         subscriber_timeout: Duration,
+        keepalive: Option<TcpKeepaliveConfig>,
         stats: either::Either<opentelemetry::metrics::Meter, BmpActorStats>,
     ) -> Result<(BmpActorJoinHandle, Self), BmpActorHandleError> {
         let stats = match stats {
@@ -1045,8 +1046,8 @@ impl BmpActorHandle {
         };
 
         // Create the TCP listener with backlog=1024 (accept queue)
-        let listener =
-            new_tcp_reuse_port(socket_addr, interface_bind.clone(), 1024).map_err(|e| {
+        let listener = new_tcp_reuse_port(socket_addr, interface_bind.clone(), 1024, keepalive)
+            .map_err(|e| {
                 error!(
                     actor_id,
                     bind_addr = %socket_addr,

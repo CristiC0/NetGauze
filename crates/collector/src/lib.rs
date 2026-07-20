@@ -439,6 +439,11 @@ pub async fn init_bmp_collection(
     bmp_config: BmpConfig,
     meter: opentelemetry::metrics::Meter,
 ) -> anyhow::Result<()> {
+    if let Some(keepalive) = bmp_config.keepalive {
+        keepalive
+            .validate()
+            .map_err(|e| anyhow::anyhow!("invalid BMP TCP keepalive configuration: {e}"))?;
+    }
     let supervisor_config = bmp_config.supervisor_config();
     let (supervisor_join_handle, supervisor_handle) =
         BmpSupervisorHandle::new(supervisor_config, meter.clone())?;
@@ -1321,5 +1326,23 @@ mod tests {
             Some(serde_json::Value::String("192.168.1.1".to_string()))
         );
         assert_eq!(value, expected_value);
+    }
+
+    #[tokio::test]
+    async fn test_init_bmp_collection_rejects_invalid_keepalive() {
+        let config = BmpConfig {
+            subscriber_timeout: std::time::Duration::from_millis(100),
+            cmd_buffer_size: 100,
+            keepalive: Some(netgauze_bmp_service::TcpKeepaliveConfig {
+                idle_secs: 0,
+                ..Default::default()
+            }),
+            listeners: vec![],
+            publishers: HashMap::new(),
+        };
+        let err = init_bmp_collection(config, opentelemetry::global::meter("test"))
+            .await
+            .expect_err("invalid keepalive must be rejected before binding");
+        assert!(err.to_string().contains("keepalive"));
     }
 }

@@ -42,3 +42,9 @@ bmp:
           writer_id: bmp-avro
           avro_converter:
             schema_type: union
+  # TCP keepalive for BMP connections. Omitted = enabled with defaults; "keepalive: null" disables it.
+  # If set, all three fields are required.
+  # keepalive:
+  #   idle_secs: 15
+  #   interval_secs: 15
+  #   retries: 9

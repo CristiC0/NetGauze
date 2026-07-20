@@ -44,6 +44,7 @@ use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
 use netgauze_bmp_service::actor::BmpActorHandle;
+use netgauze_bmp_service::default_tcp_keepalive;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use std::time::Duration;
@@ -121,6 +122,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> 
             None,
             cmd_buffer_size,
             Duration::from_millis(500),
+            default_tcp_keepalive(),
             either::Either::Left(opentelemetry::global::meter("example")),
         )?;
 

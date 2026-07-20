@@ -29,6 +29,7 @@
 //! 5. **Monitors Peers**: Periodically logs the status and connected peers of
 //!    all managed actors.
 
+use netgauze_bmp_service::default_tcp_keepalive;
 use netgauze_bmp_service::supervisor::{BindingAddress, BmpSupervisorHandle, SupervisorConfig};
 use std::net::SocketAddr;
 use std::str::FromStr;
@@ -66,6 +67,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> 
         }],
         cmd_buffer_size: 100,
         subscriber_timeout: Duration::from_secs(1),
+        keepalive: default_tcp_keepalive(),
     };
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(num_worker_threads)

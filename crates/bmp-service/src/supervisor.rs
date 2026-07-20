@@ -60,7 +60,10 @@
 //!   with multiple BMP collectors.
 
 use crate::actor::{BmpActorCommand, BmpActorError, BmpActorHandle, BmpActorStats};
-use crate::{ActorId, BmpReceiver, BmpSender, SubscriberId, Subscription, create_bmp_channel};
+use crate::{
+    ActorId, BmpReceiver, BmpSender, SubscriberId, Subscription, TcpKeepaliveConfig,
+    create_bmp_channel, default_tcp_keepalive,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -75,6 +78,8 @@ pub struct SupervisorConfig {
     pub binding_addresses: Vec<BindingAddress>,
     pub cmd_buffer_size: usize,
     pub subscriber_timeout: Duration,
+    #[serde(default = "default_tcp_keepalive")]
+    pub keepalive: Option<TcpKeepaliveConfig>,
 }
 
 /// Configuration to a given listening address
@@ -119,6 +124,7 @@ impl Default for SupervisorConfig {
             }],
             cmd_buffer_size: 100,
             subscriber_timeout: Duration::from_secs(1),
+            keepalive: default_tcp_keepalive(),
         }
     }
 }
@@ -311,6 +317,7 @@ impl BmpSupervisorHandle {
                     binding_address.interface.clone(),
                     10,
                     config.subscriber_timeout,
+                    config.keepalive,
                     either::Either::Right(stats.clone()),
                 );
                 match actor_ret {
